@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'wearstore',
     'rest_framework',
     'corsheaders',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [

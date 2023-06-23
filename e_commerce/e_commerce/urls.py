@@ -16,9 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from wearstore.views import ReactView
-
+# from wearstore.views import CustomerListView
+from wearstore import views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', ReactView.as_view(), name="xxx"),
+    # path('customers/', CustomerListView.as_view(), name="customer-list"),
+    # path('customers/', views.customer_list, name="customer-list"),
+    # path('customers/<int:id>', views.customer_detail, name="customer-detail"),
+    path('api/customer/<int:id>', views.customer_detail, name="customer_api"),
+    path('api/allcustomers', views.get_all_customers_api, name="all_customers_api"),
+    path('api/product/<int:id>', views.product_detail, name="product_api"),
+    path('api/allproducts', views.get_all_products_api, name="all_products_api"),
+    path('login/', views.login_view, name='login'),
+    # path('register/', views.registration_view, name='register'),
+    path('logout/', views.logout_view, name='logout'),
+    path('registercustomer/', views.add_customer_api, name='redistercustomer'),
+    
 ]

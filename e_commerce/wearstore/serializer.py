@@ -6,7 +6,7 @@ from .models import Customer, Product, Order, OrderItem, Address, Cart, CartItem
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['id', 'email', 'firstName', 'lastName']
+        fields = ['id', 'email', 'firstName', 'lastName','password']
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:

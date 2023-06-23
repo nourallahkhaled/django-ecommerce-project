@@ -28,6 +28,7 @@ class Customer(models.Model):
                 code='invalid_password'
             )
         ],null=False)
+    # is_admin = models.BooleanField(default=False)
     
     def __str__(self):
         return self.firstName
