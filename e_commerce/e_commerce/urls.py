@@ -20,16 +20,17 @@ from django.urls import path
 from wearstore import views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('customers/', CustomerListView.as_view(), name="customer-list"),
-    # path('customers/', views.customer_list, name="customer-list"),
-    # path('customers/<int:id>', views.customer_detail, name="customer-detail"),
     path('api/customer/<int:id>', views.customer_detail, name="customer_api"),
     path('api/allcustomers', views.get_all_customers_api, name="all_customers_api"),
     path('api/product/<int:id>', views.product_detail, name="product_api"),
     path('api/allproducts', views.get_all_products_api, name="all_products_api"),
     path('login/', views.login_view, name='login'),
-    # path('register/', views.registration_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
     path('registercustomer/', views.add_customer_api, name='redistercustomer'),
-    
+    # path('myview/', views.myview, name='myview'),
+    path('cart/', views.cart, name='cart'),
+    path('cart/add/', views.add_to_cart, name='add_to_cart'),
+    path('cart/update/', views.update_cart, name='update_cart'),
+    path('cart/remove/', views.remove_from_cart, name='remove_from_cart'),
 ]
+

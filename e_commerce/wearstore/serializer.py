@@ -32,12 +32,18 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = ['id', 'customer', 'order', 'address', 'governorate', 'city', 'date_added', 'default']
 
+
 class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
+    id = serializers.IntegerField(source='pk')
+    product = serializers.CharField(source='product.productName')
+    total_price = serializers.SerializerMethodField()
+
+    def get_total_price(self, obj):
+        return obj.product.productPrice * obj.quantity
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'quantity']
+        fields = ['id', 'product', 'quantity', 'total_price']
 
 class CartSerializer(serializers.ModelSerializer):
     cart_items = CartItemSerializer(many=True)

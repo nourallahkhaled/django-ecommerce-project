@@ -82,10 +82,15 @@ class Cart(models.Model):
 class CartItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    quantity = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f'{self.quantity} x {self.product.productName}'
+    
+    @property
+    def total_price(self):
+        return self.product.productPrice * self.quantity
     
 class Wishlist(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
