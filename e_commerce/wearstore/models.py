@@ -92,10 +92,10 @@ class CartItem(models.Model):
     def total_price(self):
         return self.product.productPrice * self.quantity
     
-class Wishlist(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    items = models.ManyToManyField(Product, related_name='wishlists')
-    date_added = models.DateTimeField(auto_now_add=True)
+# class Wishlist(models.Model):
+#     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+#     items = models.ManyToManyField(Product, related_name='wishlists')
+#     date_added = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return str(self.id)
+#     def __str__(self):
+#         return str(self.id)

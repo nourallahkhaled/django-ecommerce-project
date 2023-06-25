@@ -43,16 +43,31 @@ def customer_detail(request, id):
     return Response(data=data, status=http_status)
 
 # ---------- PRODUCTS API ----------------
-@api_view(['GET'])
-def get_all_products_api(request):
+@api_view(['GET', 'POST'])
+def product_list(request):
     data = {}
     try:
-        products = Product.objects.all()
-        products_serializer = ProductSerializer(products, many=True)
-        data = products_serializer.data
-        http_status = status.HTTP_200_OK
+        if request.method == 'GET':
+            # Check if a search query is provided
+            search_query = request.query_params.get('search', None)
+            if search_query:
+                products = Product.objects.filter(productName__icontains=search_query)
+            else:
+                products = Product.objects.all()
+            products_serializer = ProductSerializer(products, many=True)
+            data = products_serializer.data
+            http_status = status.HTTP_200_OK
+        elif request.method == 'POST':
+            product_serializer = ProductSerializer(data=request.data)
+            if product_serializer.is_valid():
+                product_serializer.save()
+                data = product_serializer.data
+                http_status = status.HTTP_201_CREATED
+            else:
+                data = product_serializer.errors
+                http_status = status.HTTP_400_BAD_REQUEST
     except Exception as e:
-        print(f'exception in get_all_products_api => {e}')
+        print(f'exception in product_list => {e}')
         http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
     return Response(data=data, status=http_status)
 
@@ -71,14 +86,16 @@ def product_detail(request, id):
                 product_serializer.save()
                 data = product_serializer.data
                 http_status = status.HTTP_200_OK
+            else:
+                data = product_serializer.errors
+                http_status = status.HTTP_400_BAD_REQUEST
         if request.method == 'DELETE':
             product.delete()
             http_status = status.HTTP_204_NO_CONTENT
     except Exception as e:
-        print(f'exception in one product => {e}')
+        print(f'exception in product_detail => {e}')
         http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
     return Response(data=data, status=http_status)
-
 
 # ========= Login & Registeration =========
 from django.contrib.auth import authenticate, login, logout
@@ -86,7 +103,6 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-
 
 # @api_view(['POST'])
 # def login_view(request):
@@ -101,6 +117,7 @@ from django.contrib.auth.decorators import login_required
 #             return JsonResponse({'success': False, 'error': 'Invalid username or password.'})
 #     else:
 #         return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from .models import CartItem
@@ -115,29 +132,8 @@ class CartItemViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-@api_view(['POST'])
-def login_view(request):
-    if request.method == 'POST':
-        email = request.data.get('email')
-        password = request.data.get('password')
-        user = authenticate(request, username=email, password=password)
-        if user is not None:
-            login(request, user)
-            # create a Customer object for the authenticated user
-            customer, created = Customer.objects.get_or_create(user=user)
-            return JsonResponse({'success': True})
-        else:
-            return JsonResponse({'success': False, 'error': 'Invalid username or password.'})
-    else:
-        return JsonResponse({'success': False, 'error': 'Invalid request method.'})
-    
-    
 
-def logout_view(request):
-    logout(request)
-    return JsonResponse({'success': True})
-
-
+# ======= Register ========
 @api_view(['POST'])
 @csrf_exempt
 def add_customer_api(request):
@@ -164,6 +160,27 @@ def add_customer_api(request):
         data = {'error': 'An error occurred.'}
         http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
     return Response(data=data, status=http_status)
+
+# ======= Login ========
+@api_view(['POST'])
+def login_view(request):
+    if request.method == 'POST':
+        email = request.data.get('email')
+        password = request.data.get('password')
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            login(request, user)
+            # create a Customer object for the authenticated user
+            customer, created = Customer.objects.get_or_create(user=user)
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid username or password.'})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+    
+def logout_view(request):
+    logout(request)
+    return JsonResponse({'success': True})
 
 
 from django.shortcuts import get_object_or_404
